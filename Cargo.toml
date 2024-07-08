@@ -17,7 +17,7 @@ futures = "0.3.16"
 googapis = { version = "0.6.0", features = [
     "google-assistant-embedded-v1alpha2",
 ] }
-log = "0.4.21"
+log = "0.4.22"
 oauth2 = "4.1.0"
 pretty_env_logger = "0.5.0"
 rfbutton = "0.1.1"

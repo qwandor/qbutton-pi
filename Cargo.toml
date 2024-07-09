@@ -14,7 +14,7 @@ cc1101 = { version = "0.1.3", features = ["std"] }
 embedded-hal-bus = { version = "0.2.0", features = ["std"] }
 eyre = "0.6.12"
 futures = "0.3.16"
-googapis = { version = "0.6.0", features = [
+google-api-proto = { version = "1.696.0", features = [
     "google-assistant-embedded-v1alpha2",
 ] }
 log = "0.4.22"
@@ -30,7 +30,7 @@ tokio = { version = "1.38", features = [
     "fs",
     "macros",
 ] }
-tonic = { version = "0.6.2", features = ["tls"] }
+tonic = { version = "0.11.0", features = ["tls", "tls-webpki-roots"] }
 
 [package.metadata.deb]
 # $auto doesn't work because we don't build packages in the same container as we build the binaries.

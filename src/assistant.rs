@@ -24,8 +24,7 @@ use oauth2::{
     reqwest::async_http_client,
     {AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl},
 };
-use std::str::FromStr;
-use tonic::{metadata::MetadataValue, transport::Channel, Request};
+use tonic::{transport::Channel, Request};
 
 const OAUTH_AUTH_URL: &str = "https://oauth2.googleapis.com/auth";
 const OAUTH_TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
@@ -52,7 +51,7 @@ pub async fn make_request(config: &Config, bearer: &str, command: &str) -> Resul
 
     let mut service =
         EmbeddedAssistantClient::with_interceptor(channel, move |mut req: Request<()>| {
-            let meta = MetadataValue::from_str(&format!("Bearer {}", bearer)).unwrap();
+            let meta = format!("Bearer {}", bearer).parse().unwrap();
             req.metadata_mut().insert("authorization", meta);
             Ok(req)
         });

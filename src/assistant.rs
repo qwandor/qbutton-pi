@@ -14,28 +14,21 @@
 
 use crate::config::Config;
 use eyre::Report;
-use googapis::{
-    google::assistant::embedded::v1alpha2::{
-        assist_config, assist_request, audio_out_config::Encoding,
-        embedded_assistant_client::EmbeddedAssistantClient, AssistConfig, AssistRequest,
-        AudioOutConfig, DeviceConfig,
-    },
-    CERTIFICATES,
+use google_api_proto::google::assistant::embedded::v1alpha2::{
+    assist_config, assist_request, audio_out_config::Encoding,
+    embedded_assistant_client::EmbeddedAssistantClient, AssistConfig, AssistRequest,
+    AudioOutConfig, DeviceConfig,
 };
 use log::trace;
 use oauth2::{
     reqwest::async_http_client,
     {AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl},
 };
-use tonic::{
-    metadata::MetadataValue,
-    transport::{Certificate, Channel, ClientTlsConfig},
-    Request,
-};
+use std::str::FromStr;
+use tonic::{metadata::MetadataValue, transport::Channel, Request};
 
 const OAUTH_AUTH_URL: &str = "https://oauth2.googleapis.com/auth";
 const OAUTH_TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
-const ASSISTANT_API_HOSTNAME: &str = "embeddedassistant.googleapis.com";
 const ASSISTANT_API_URL: &str = "https://embeddedassistant.googleapis.com";
 
 pub async fn get_token(config: &Config) -> Result<String, Report> {
@@ -55,14 +48,7 @@ pub async fn get_token(config: &Config) -> Result<String, Report> {
 }
 
 pub async fn make_request(config: &Config, bearer: &str, command: &str) -> Result<(), Report> {
-    let tls_config = ClientTlsConfig::new()
-        .ca_certificate(Certificate::from_pem(CERTIFICATES))
-        .domain_name(ASSISTANT_API_HOSTNAME);
-
-    let channel = Channel::from_static(ASSISTANT_API_URL)
-        .tls_config(tls_config)?
-        .connect()
-        .await?;
+    let channel = Channel::from_static(ASSISTANT_API_URL).connect().await?;
 
     let mut service =
         EmbeddedAssistantClient::with_interceptor(channel, move |mut req: Request<()>| {

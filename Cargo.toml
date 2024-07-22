@@ -30,7 +30,7 @@ tokio = { version = "1.38", features = [
     "fs",
     "macros",
 ] }
-tonic = { version = "0.11.0", features = ["tls", "tls-webpki-roots"] }
+tonic = { version = "0.12.1", features = ["tls", "tls-webpki-roots"] }
 
 [package.metadata.deb]
 # $auto doesn't work because we don't build packages in the same container as we build the binaries.

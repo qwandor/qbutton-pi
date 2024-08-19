@@ -21,7 +21,7 @@ log = "0.4.22"
 oauth2 = "4.1.0"
 pretty_env_logger = "0.5.0"
 rfbutton = "0.1.1"
-rppal = { version = "0.18.0", features = ["hal"] }
+rppal = { version = "0.19.0", features = ["hal"] }
 serde = "1.0.208"
 toml = "0.8.19"
 tokio = { version = "1.39.3", features = [

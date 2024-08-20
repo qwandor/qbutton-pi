@@ -22,7 +22,7 @@ use embedded_hal_bus::spi::ExclusiveDevice;
 use eyre::{bail, eyre, Report, WrapErr};
 use log::{debug, info, trace};
 use rppal::{
-    gpio::{Gpio, InputPin, Level, OutputPin, Trigger},
+    gpio::{Event, Gpio, InputPin, Level, OutputPin, Trigger},
     hal::Delay,
     spi::{Bus, Mode, SlaveSelect, Spi},
 };
@@ -99,7 +99,7 @@ impl Radio {
             .map_err(|e| eyre!("{:?}", e))?;
 
         // Enable interrupts.
-        rx_pin.set_interrupt(Trigger::Both)?;
+        rx_pin.set_interrupt(Trigger::Both, None)?;
 
         Ok(Self {
             _cc1101: cc1101,
@@ -109,28 +109,27 @@ impl Radio {
 
     pub fn receive(&mut self) -> Result<Vec<u16>, Report> {
         debug!("Waiting for interrupt...");
-        let level = self.rx_pin.poll_interrupt(false, None)?;
-        if level.is_none() {
-            bail!("Unexpected initial level {:?}", level);
-        }
-        debug!("Initial level: {:?}", level);
+        let Some(event) = self.rx_pin.poll_interrupt(false, None)? else {
+            bail!("No initial event.");
+        };
+        debug!("Initial event: {:?}", event);
         let mut last_timestamp = Instant::now();
         let mut pulses = Vec::new();
 
         debug!("Waiting for initial break pulse...");
         // Wait for a long pulse to start.
         let mut last_pulse = Duration::default();
-        while let Some(level) = self.rx_pin.poll_interrupt(false, None)? {
+        while let Some(event) = self.rx_pin.poll_interrupt(false, None)? {
             let timestamp = Instant::now();
             let pulse_length = timestamp - last_timestamp;
             last_timestamp = timestamp;
 
-            if level == Level::High && pulse_length > BREAK_PULSE_LENGTH {
+            if event.trigger == Trigger::RisingEdge && pulse_length > BREAK_PULSE_LENGTH {
                 trace!(
                     "Found possible initial break pulse {} μs.",
                     pulse_length.as_micros()
                 );
-            } else if level == Level::Low
+            } else if event.trigger == Trigger::FallingEdge
                 && last_pulse > BREAK_PULSE_LENGTH
                 && pulse_length < BREAK_PULSE_LENGTH
             {
@@ -156,7 +155,7 @@ impl Radio {
                 trace!(
                     "Ignoring {} μs {:?} pulse.",
                     pulse_length.as_micros(),
-                    !level
+                    previous_level(&event),
                 );
             }
 
@@ -164,7 +163,7 @@ impl Radio {
         }
 
         debug!("Reading pulses...");
-        while let Some(level) = self.rx_pin.poll_interrupt(false, Some(MAX_PULSE_LENGTH))? {
+        while let Some(event) = self.rx_pin.poll_interrupt(false, Some(MAX_PULSE_LENGTH))? {
             let timestamp = Instant::now();
             let pulse_length = timestamp - last_timestamp;
             pulses.push(
@@ -176,8 +175,8 @@ impl Radio {
             if pulse_length > BREAK_PULSE_LENGTH {
                 debug!(
                     "Found final {:?} break pulse {} μs.",
-                    !level,
-                    pulse_length.as_micros()
+                    previous_level(&event),
+                    pulse_length.as_micros(),
                 );
                 break;
             }
@@ -185,5 +184,14 @@ impl Radio {
         }
 
         Ok(pulses)
+    }
+}
+
+/// Given an interreupt, returns the level of the pin before the interrupt trigger.
+fn previous_level(event: &Event) -> Level {
+    if event.trigger == Trigger::RisingEdge {
+        Level::Low
+    } else {
+        Level::High
     }
 }

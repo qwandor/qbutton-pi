@@ -18,7 +18,7 @@ google-api-proto = { version = "1.710.0", features = [
     "google-assistant-embedded-v1alpha2",
 ] }
 log = "0.4.25"
-oauth2 = "4.1.0"
+oauth2 = "5.0.0"
 pretty_env_logger = "0.5.0"
 rfbutton = "0.1.1"
 rppal = { version = "0.22.1", features = ["hal"] }

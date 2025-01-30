@@ -21,8 +21,7 @@ use google_api_proto::google::assistant::embedded::v1alpha2::{
 };
 use log::trace;
 use oauth2::{
-    reqwest::async_http_client,
-    {AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl},
+    reqwest::Client, AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl,
 };
 use tonic::{transport::Channel, Request};
 
@@ -31,16 +30,14 @@ const OAUTH_TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const ASSISTANT_API_URL: &str = "https://embeddedassistant.googleapis.com";
 
 pub async fn get_token(config: &Config) -> Result<String, Report> {
-    let client = oauth2::basic::BasicClient::new(
-        ClientId::new(config.client_id.to_string()),
-        Some(ClientSecret::new(config.client_secret.to_string())),
-        AuthUrl::new(OAUTH_AUTH_URL.to_string())?,
-        Some(TokenUrl::new(OAUTH_TOKEN_URL.to_string())?),
-    );
+    let client = oauth2::basic::BasicClient::new(ClientId::new(config.client_id.to_string()))
+        .set_client_secret(ClientSecret::new(config.client_secret.to_string()))
+        .set_auth_uri(AuthUrl::new(OAUTH_AUTH_URL.to_string())?)
+        .set_token_uri(TokenUrl::new(OAUTH_TOKEN_URL.to_string())?);
 
     let token_response = client
         .exchange_refresh_token(&RefreshToken::new(config.refresh_token.to_string()))
-        .request_async(async_http_client)
+        .request_async(&Client::new())
         .await?;
 
     Ok(token_response.access_token().secret().clone())

@@ -15,15 +15,14 @@
 use crate::config::Config;
 use eyre::Report;
 use google_api_proto::google::assistant::embedded::v1alpha2::{
-    assist_config, assist_request, audio_out_config::Encoding,
-    embedded_assistant_client::EmbeddedAssistantClient, AssistConfig, AssistRequest,
-    AudioOutConfig, DeviceConfig,
+    AssistConfig, AssistRequest, AudioOutConfig, DeviceConfig, assist_config, assist_request,
+    audio_out_config::Encoding, embedded_assistant_client::EmbeddedAssistantClient,
 };
 use log::trace;
 use oauth2::{
-    reqwest::Client, AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl,
+    AuthUrl, ClientId, ClientSecret, RefreshToken, TokenResponse, TokenUrl, reqwest::Client,
 };
-use tonic::{transport::Channel, Request};
+use tonic::{Request, transport::Channel};
 
 const OAUTH_AUTH_URL: &str = "https://oauth2.googleapis.com/auth";
 const OAUTH_TOKEN_URL: &str = "https://oauth2.googleapis.com/token";

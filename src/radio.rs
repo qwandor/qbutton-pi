@@ -15,11 +15,11 @@
 use std::time::{Duration, Instant};
 
 use cc1101::{
-    lowlevel::types::AutoCalibration, Cc1101, FilterLength, Modulation, RadioMode, SyncMode,
-    TargetAmplitude,
+    Cc1101, FilterLength, Modulation, RadioMode, SyncMode, TargetAmplitude,
+    lowlevel::types::AutoCalibration,
 };
 use embedded_hal_bus::spi::ExclusiveDevice;
-use eyre::{bail, eyre, Report, WrapErr};
+use eyre::{Report, WrapErr, bail, eyre};
 use log::{debug, info, trace};
 use rppal::{
     gpio::{Event, Gpio, InputPin, Level, OutputPin, Trigger},

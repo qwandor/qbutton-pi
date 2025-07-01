@@ -23,7 +23,7 @@ use crate::{
 use eyre::Report;
 use log::{debug, error, info, trace, warn};
 use radio::Radio;
-use rfbutton::{decode, Code};
+use rfbutton::{Code, decode};
 use std::time::{Duration, Instant};
 
 /// The minimum amount of time between repeating a command for the same button code.

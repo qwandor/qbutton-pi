@@ -1,6 +1,6 @@
 [package]
 name = "qbutton-pi"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Andrew Walbran <qwandor@gmail.com>"]
 edition = "2024"
 description = "Service to send Google Assistant commands in response to 433 MHz RF codes."

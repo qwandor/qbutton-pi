@@ -17,7 +17,7 @@ futures = "0.3.31"
 google-api-proto = { version = "1.710.0", features = [
     "google-assistant-embedded-v1alpha2",
 ] }
-log = "0.4.28"
+log = "0.4.29"
 oauth2 = "5.0.0"
 pretty_env_logger = "0.5.0"
 rfbutton = "0.1.1"
